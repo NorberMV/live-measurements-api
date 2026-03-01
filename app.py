@@ -8,6 +8,7 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import torch
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import torch.nn.functional as F
 import ssl
 import certifi
@@ -17,6 +18,7 @@ ssl._create_default_https_context = lambda: ssl_context
 
 
 app = Flask(__name__)
+CORS(app)
 
 # Download model if not exists
 MODEL_PATH = "pose_landmarker_heavy.task"
@@ -431,6 +433,10 @@ def validate_front_image(image_np):
         print(f"Error validating body image: {e}")
         return False, "You arent providing images correctly. Please try again."
     
+@app.route("/", methods=["GET"])
+def index():
+    return open("test_api.html").read()
+
 @app.route("/upload_images", methods=["POST"])
 def upload_images():
     global landmarker, depth_model

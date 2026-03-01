@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Your Body Scan API</title></head>
+<body>
+  <h2>Upload Photos to Your Live API</h2>
+  <form id="form" enctype="multipart/form-data">
+    <label>Front Photo (required):</label><br>
+    <input type="file" name="front" accept="image/*" required><br><br>
+    <label>Left Side Photo (optional):</label><br>
+    <input type="file" name="left_side" accept="image/*"><br><br>
+    <label>Height (cm):</label><br>
+    <input type="number" name="height_cm" value="165" required><br><br>
+    <button type="submit">Scan → Get Measurements</button>
+  </form>
+
+  <pre id="result"></pre>
+
+  <script>
+    document.getElementById('form').onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      try {
+        const res = await fetch('https://live-measurements-api-1q6w.onrender.com/upload_images', {
+          method: 'POST',
+          body: formData
+        });
+        const json = await res.json();
+        document.getElementById('result').textContent = JSON.stringify(json, null, 2);
+      } catch (error) {
+        document.getElementById('result').textContent = 'Error: ' + error.message;
+      }
+    };
+  </script>
+</body>
+</html>
