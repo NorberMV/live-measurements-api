@@ -31,11 +31,7 @@ if not os.path.exists(MODEL_PATH):
             f.write(chunk)
     print("Download complete.")
 
-base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
-options = vision.PoseLandmarkerOptions(
-    base_options=base_options,
-    output_segmentation_masks=False)
-landmarker = vision.PoseLandmarker.create_from_options(options)
+landmarker = None
 
 class PoseLandmark:
     NOSE = 0
@@ -88,7 +84,7 @@ def load_depth_model():
     model.eval()
     return model
 
-depth_model = load_depth_model()
+depth_model = None
 
 def calibrate_focal_length(image, real_width_cm, detected_width_px):
     """Dynamically calibrates focal length using a known object."""
@@ -437,6 +433,22 @@ def validate_front_image(image_np):
     
 @app.route("/upload_images", methods=["POST"])
 def upload_images():
+    global landmarker, depth_model
+
+    if landmarker is None:
+        print("Loading MediaPipe landmarker...")
+        base_options = python.BaseOptions(model_asset_path=MODEL_PATH)
+        options = vision.PoseLandmarkerOptions(
+            base_options=base_options,
+            output_segmentation_masks=False)
+        landmarker = vision.PoseLandmarker.create_from_options(options)
+        print("MediaPipe loaded.")
+
+    if depth_model is None:
+        print("Loading MiDaS depth model...")
+        depth_model = load_depth_model()
+        print("MiDaS loaded.")
+
     if "front" not in request.files:
         return jsonify({"error": "Missing front image for reference."}), 400
     
