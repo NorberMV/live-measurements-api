@@ -81,6 +81,9 @@ DEFAULT_HEIGHT_CM = 152.0  # Default height if not provided
 
 # Load depth estimation model
 def load_depth_model():
+    # Bypass the forked repo check that causes KeyError on some envs
+    torch.hub._validate_not_a_forked_repo = lambda a, b, c: None
+    
     model = torch.hub.load("intel-isl/MiDaS", "MiDaS_small")
     model.eval()
     return model
