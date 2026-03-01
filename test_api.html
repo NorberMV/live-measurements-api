@@ -1,7 +1,57 @@
 <!DOCTYPE html>
 <html>
-<head><title>Test Your Body Scan API</title></head>
+
+<head>
+  <title>Test Your Body Scan API</title>
+  <style>
+    /* Full screen overlay style */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      display: none;
+      /* Hidden by default */
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-family: sans-serif;
+    }
+
+    .spinner {
+      border: 6px solid #f3f3f3;
+      /* Light grey */
+      border-top: 6px solid #3498db;
+      /* Blue */
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
 <body>
+  <!-- Loading Overlay Element -->
+  <div id="loadingOverlay">
+    <div class="spinner"></div>
+    <h2>Scanning... Hold tight! 👾</h2>
+  </div>
   <h2>Upload Photos to Your Live API</h2>
   <form id="form" enctype="multipart/form-data">
     <label>Front Photo (required):</label><br>
@@ -18,6 +68,12 @@
   <script>
     document.getElementById('form').onsubmit = async (e) => {
       e.preventDefault();
+
+      // Show overlay
+      const overlay = document.getElementById('loadingOverlay');
+      overlay.style.display = 'flex';
+      document.getElementById('result').textContent = '';
+
       const formData = new FormData(e.target);
       try {
         const res = await fetch('https://live-measurements-api-1q6w.onrender.com/upload_images', {
@@ -28,11 +84,15 @@
         document.getElementById('result').textContent = JSON.stringify(json, null, 2);
       } catch (error) {
         document.getElementById('result').textContent = 'Error: ' + error.message;
+      } finally {
+        // Hide overlay whether it succeeds or fails
+        overlay.style.display = 'none';
       }
     };
   </script>
   <footer style="margin-top: 30px; text-align: center; font-family: sans-serif; color: #555;">
-    built by Digital Rebels with ❤️ 👾
+    built by <strong>Digital Rebels</strong> 👾 with ❤️
   </footer>
 </body>
+
 </html>
